@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 from pymongo import MongoClient
 import tornado.web
 
@@ -73,7 +74,8 @@ class UpdateModelForDatasetIdTuri(BaseHandler):
             
             model = tc.classifier.create(data,target='target',verbose=0)# training
             yhat = model.predict(data)
-            self.clf = model
+            self.clf[dsid] = model  #change the clf to dictionary and set the model to the dsid
+            print(self.clf)
             acc = sum(yhat==data['target'])/float(len(data))
             # save model for use later, if desired
             model.save('../models/turi_model_dsid%d'%(dsid))
@@ -107,13 +109,27 @@ class PredictOneFromDatasetIdTuri(BaseHandler):
 
         # load the model from the database (using pickle)
         # we are blocking tornado!! no!!
-        if(self.clf == []):
-            print('Loading Model From file')
-            self.clf = tc.load_model('../models/turi_model_dsid%d'%(dsid))
-  
-
-        predLabel = self.clf.predict(fvals);
+        # Part three
+        # get the model for the clf dictionary
+        # Accessing the model for a specific dsid
+        if dsid in self.clf:
+            model = self.clf[dsid]
+        # Now you can use turi_model as needed
+        else:
+        # Handle the case where dsid is not in the dictionary
+            model=tc.load_model('../models/turi_model_dsid%d'%(dsid))
+            print(f"Model for dsid {dsid} not found.")
+        
+        predLabel= model.predict(fvals);
         self.write_json({"prediction":str(predLabel)})
+
+        # original method
+        # if(self.clf == []):
+        #     print('Loading Model From file')
+        #     self.clf = tc.load_model('../models/turi_model_dsid%d'%(dsid))
+
+        # predLabel = self.clf.predict(fvals);
+        # self.write_json({"prediction":str(predLabel)})
 
     def get_features_as_SFrame(self, vals):
         # create feature vectors from array input
@@ -147,9 +163,9 @@ class UpdateModelForDatasetIdSklearn(BaseHandler):
         if labels:
             model.fit(features,labels) # training
             lstar = model.predict(features)
-            self.clf = model
+            self.clf[dsid]= model    # change the clf to dictionary to store the model and the key is dsid
             acc = sum(lstar==labels)/float(len(labels))
-
+            print(self.clf)
             # just write this to model files directory
             dump(model, '../models/sklearn_model_dsid%d.joblib'%(dsid))
 

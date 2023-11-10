@@ -9,7 +9,7 @@
 # database imports
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
-# when i want to run in vscode , I need switch to the env i have set and choose the right interpreter
+# when i want to run in vscode , I need switch to the env i have set and choose the right interpreter --rw
 
 # tornado imports
 import tornado.web
@@ -45,8 +45,8 @@ class Application(tornado.web.Application):
                     (r"/Handlers[/]?",        th.PrintHandlers),
                     (r"/AddDataPoint[/]?",    th.UploadLabeledDatapointHandler),
                     (r"/GetNewDatasetId[/]?", th.RequestNewDatasetId),
-                    (r"/UpdateModel[/]?",     th.UpdateModelForDatasetIdSklearn),     
-                    (r"/PredictOne[/]?",      th.PredictOneFromDatasetIdSklearn),  
+                    (r"/UpdateModel[/]?",     th.UpdateModelForDatasetIdTuri),     #update for turi beacue the confict FileNotFoundError: [Errno 2] No such file or directory: '../models/sklearn_model_dsid1.joblib'
+                    (r"/PredictOne[/]?",      th.PredictOneFromDatasetIdTuri),  
                     (r"/GetExample[/]?",      eh.TestHandler),
                     (r"/DoPost[/]?",          eh.PostHandlerAsGetArguments),
                     (r"/PostWithJson[/]?",    eh.JSONPostHandler),
@@ -70,7 +70,7 @@ class Application(tornado.web.Application):
             print('   using the "brew services start mongodb-community@6.0" command')
             #raise inst
         
-        self.clf = [] # the classifier model (in-class assignment, you might need to change this line!)
+        self.clf = {} # change it to dictionary,  the classifier model (in-class assignment, you might need to change this line!)
         # but depending on your implementation, you may not need to change it  ¯\_(ツ)_/¯
 
         print('=================================')
