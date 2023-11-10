@@ -114,7 +114,7 @@ class PredictOneFromDatasetIdTuri(BaseHandler):
         # Accessing the model for a specific dsid
         if dsid in self.clf:
             model = self.clf[dsid]
-            print(f"Model for dsid {dsid} not found in dic.")
+            print(f"Model for dsid {dsid} found in dic.")
             predLabel= model.predict(fvals);
             self.write_json({"prediction":str(predLabel)})
         # Now you can use turi_model as needed
@@ -133,7 +133,7 @@ class PredictOneFromDatasetIdTuri(BaseHandler):
               # The directory doesn't exist, handle the error accordingly
               # Means trained not done 
                 print(f"Error: Directory {model_path} does not exist.")
-                self.write_json({"error":"Wait for the model trainning"})
+                self.write_json({"error":"No exist Model,Wait for the dsid:%d  model trainning"%(dsid)})
 
             
             
